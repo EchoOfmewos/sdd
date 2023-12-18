@@ -265,7 +265,7 @@ FightingSection:addToggle({
 MiningSection:addButton({
     title = "Close GUI",
     callback = function()
-        UI:Destroy()
+        UI:toggle()
     end
 })
 

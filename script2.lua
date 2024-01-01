@@ -183,4 +183,85 @@ local function manageHitRegistration()
     while isFighting do
         if not player.Character then
             task.wait(0.5)
-           
+            return
+        end
+        local swords = {}
+        for _, sword in pairs(player.Character:GetChildren()) do
+            if sword:IsA("Tool") and sword:FindFirstChild("RemoteFunction") then
+                table.insert(swords, sword)
+            end
+        end
+
+        for _, sword in pairs(swords) do
+            spawn(function()
+                sword.RemoteFunction:InvokeServer("hit", {0, 0})
+                print("Invoked: " .. sword.Name)
+            end)
+        end
+
+        task.wait(0.5)
+    end
+end
+
+local function onPlayerCharacterAdded(character)
+    task.wait(0.5)
+    if isMining then
+        miningMain()
+    end
+    spawn(combatMain)
+    spawn(manageHitRegistration)
+end
+
+player.CharacterAdded:Connect(onPlayerCharacterAdded)
+
+-- GUI Setup and Other Functionalities
+local Venyx = loadstring(game:HttpGet("https://raw.githubusercontent.com/Stefanuk12/Venyx-UI-Library/main/source2.lua"))()
+local UI = Venyx.new({ title = "Balanced Craftwars Overhaul" })
+local MiningPage = UI:addPage({ title = "Mining", icon = 5012544693 })
+local MiningSection = MiningPage:addSection({ title = "Mining Controls" })
+local FightingPage = UI:addPage({ title = "Fighting", icon = 5012544693 })
+local FightingSection = FightingPage:addSection({ title = "Fighting Controls" })
+
+MiningSection:addToggle({
+    title = "Break All Ores",
+    callback = function(value)
+        isMining = value
+        if value then
+            miningMain()
+        end
+    end
+})
+
+MiningSection:addDropdown({
+    title = "Break Selected Ore",
+    list = oreList,
+    callback = function(value)
+        selectedOre = value
+        if isMining then
+            miningMain()
+        end
+    end
+})
+
+FightingSection:addToggle({
+    title = "Enable Fighting",
+    callback = function(value)
+        isFighting = value
+        if value then
+            spawn(combatMain)
+            spawn(manageHitRegistration)
+        end
+    end
+})
+
+-- Add a button to close the GUI
+MiningSection:addButton({
+    title = "Close GUI",
+    callback = function()
+        UI:toggle()
+    end
+})
+
+-- ... (other GUI elements)
+
+-- Rest of your script

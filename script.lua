@@ -76,7 +76,7 @@ local function locateNextOre()
                 local meshPart = ore:FindFirstChildOfClass("MeshPart")
                 if hitpoint > 0 and pickaxePower >= oreToughness and meshPart then
                     local base = ore:FindFirstChild("Base")
-                    if not base or (base and not (base.Rotation.X == 0 and base.Rotation.Y == 90 and base.Rotation.Z == 0)) then
+                    if not base then
                         if selectedOre == "" or ore.Name:find(selectedOre) then
                             local distance = (humanoidRootPart.Position - meshPart.Position).Magnitude
                             if distance < minDistance then
